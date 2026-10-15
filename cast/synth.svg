@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="64" height="64" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="#1a1b26"/>
+  <rect x="3" y="1" width="10" height="2" fill="#ff75c3"/>
+  <rect x="1" y="3" width="2" height="7" fill="#bb9af7">
+    <animate attributeName="fill" values="#bb9af7;#ff75c3;#7dcfff;#bb9af7" dur="0.8s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="13" y="3" width="2" height="7" fill="#bb9af7">
+    <animate attributeName="fill" values="#bb9af7;#ff75c3;#7dcfff;#bb9af7" dur="0.8s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="3" y="3" width="10" height="9" fill="#24283b"/>
+  <rect x="4" y="4" width="8" height="3" fill="#1a1b26"/>
+  <rect x="5" y="5" width="2" height="2" fill="#7dcfff">
+    <animate attributeName="height" values="1;2;1" dur="0.5s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="9" y="5" width="2" height="2" fill="#ff75c3">
+    <animate attributeName="height" values="2;1;2" dur="0.5s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="4" y="8" width="8" height="3" fill="#1a1b26"/>
+  <rect x="5" y="9" width="1" height="2" fill="#ff75c3">
+    <animate attributeName="height" values="1;2;1" dur="0.35s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="7" y="8" width="2" height="3" fill="#7dcfff">
+    <animate attributeName="height" values="3;1;2;3" dur="0.35s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="10" y="9" width="1" height="2" fill="#bb9af7">
+    <animate attributeName="height" values="2;1;2" dur="0.35s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="3" y="12" width="10" height="3" fill="#414868"/>
+  <rect x="5" y="13" width="6" height="1" fill="#ff75c3"/>
+</svg>
