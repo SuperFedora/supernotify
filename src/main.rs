@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 mod cast;
+mod overlay;
 mod state;
 mod tui;
 
 use crate::cast::{CAST_ROSTER, animate_cast_cli, print_roster, sync_cast_assets, trigger_banner, trigger_cast};
+use crate::overlay::run_overlay;
 use crate::state::{NotifyEnv, load_notifs, qs_call, qs_running, save_notifs};
 use crate::tui::run_tui;
 use std::env;
@@ -13,10 +15,11 @@ use std::io::{self, IsTerminal};
 use std::process::{self, Command};
 
 fn print_help() {
-    println!("SuperNotify v0.2.0 — Standalone 16-Bit Animated Cast Comms & Arcade Banner Engine");
+    println!("SuperNotify v0.3.0 — Standalone 16-Bit Animated Cast Comms & Arcade Banner Engine");
     println!("Usage:");
     println!("  supernotify                                           Launch interactive 16-Bit Cast & Banner TUI");
     println!("  supernotify tui                                       Launch interactive 16-Bit Cast & Banner TUI");
+    println!("  supernotify overlay [--once|--json]                   Launch native <15MB Layer-Shell overlay renderer");
     println!("  supernotify status                                    Show daemon status, DND, unread & Cast Roster");
     println!("  supernotify cast [role|all|list]                      Show 10-specialist Cast Roster or trigger Cast Comms");
     println!("  supernotify animate [role] [--frames N]               Preview multi-frame 16-bit terminal sprite animation");
@@ -48,11 +51,16 @@ fn main() {
 
     match action {
         "tui" => process::exit(run_tui(&env)),
+        "overlay" | "--overlay" | "hud" | "layer-shell" => {
+            let once = args.iter().any(|a| a == "--once" || a == "-1");
+            let json = args.iter().any(|a| a == "--json");
+            process::exit(run_overlay(&env, once, json));
+        }
         "version" | "--version" | "-V" => {
-            println!("supernotify 0.2.0 (SuperFedora/supernotify — Rust 1.99 Native Engine)");
+            println!("supernotify 0.3.0 (SuperFedora/supernotify — Rust 1.99 Native Engine)");
         }
         "status" => {
-            println!("  [OK] Notification Server : {}", if qs_running() { "running (quickshell)" } else { "offline" });
+            println!("  [OK] Notification Server : {}", if qs_running() { "running (quickshell)" } else { "native-overlay ready (<15MB)" });
             println!("  [OK] Do Not Disturb      : {}", if st.dnd { "on" } else { "off" });
             println!("  [OK] Sprite Animations   : {}", if st.animations { "enabled (SVG + 60fps Canvas)" } else { "paused" });
             println!("  [OK] Unread in Center    : {}", st.history.len());
