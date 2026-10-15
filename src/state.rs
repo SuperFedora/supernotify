@@ -111,15 +111,21 @@ impl NotifyEnv {
 
 pub fn load_notifs(env: &NotifyEnv) -> NotifState {
     let p = env.state_dir.join("notifications.json");
+    let anim_override = fs::read_to_string(env.state_dir.join("animations"))
+        .ok()
+        .map(|s| !matches!(s.trim(), "0" | "off" | "false"));
     if let Ok(txt) = fs::read_to_string(&p)
         && let Ok(mut st) = serde_json::from_str::<NotifState>(&txt)
     {
         if !txt.contains("\"animations\"") {
             st.animations = true;
         }
+        if let Some(a) = anim_override {
+            st.animations = a;
+        }
         return st;
     }
-    let st = NotifState { dnd: false, animations: true, history: Vec::new() };
+    let st = NotifState { dnd: false, animations: anim_override.unwrap_or(true), history: Vec::new() };
     save_notifs(env, &st);
     st
 }
