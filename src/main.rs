@@ -15,7 +15,7 @@ use std::io::{self, IsTerminal};
 use std::process::{self, Command};
 
 fn print_help() {
-    println!("SuperNotify v0.3.0 — Standalone 16-Bit Animated Cast Comms & Arcade Banner Engine");
+    println!("SuperNotify v0.3.1 — Standalone 16-Bit Animated Cast Comms & Arcade Banner Engine");
     println!("Usage:");
     println!("  supernotify                                           Launch interactive 16-Bit Cast & Banner TUI");
     println!("  supernotify tui                                       Launch interactive 16-Bit Cast & Banner TUI");
@@ -57,7 +57,7 @@ fn main() {
             process::exit(run_overlay(&env, once, json));
         }
         "version" | "--version" | "-V" => {
-            println!("supernotify 0.3.0 (SuperFedora/supernotify — Rust 1.99 Native Engine)");
+            println!("supernotify 0.3.1 (SuperFedora/supernotify — Rust 1.99 Native Engine)");
         }
         "status" => {
             println!("  [OK] Notification Server : {}", if qs_running() { "running (quickshell)" } else { "native-overlay ready (<15MB)" });
