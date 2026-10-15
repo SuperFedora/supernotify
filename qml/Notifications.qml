@@ -8,7 +8,7 @@ import Quickshell.Services.Notifications
 import Quickshell.Services.UPower
 import "panels"
 
-// 16-Bit Workstation Multi-Zone Animated Comms & Banner Daemon (10-Specialist Pixel Cast + 60fps Sprite Canvas).
+// 16-Bit Workstation Multi-Zone Comms & Banner Daemon (SNES / Mega Man X style comms boxes + Theme-bound pixel cast).
 Scope {
     id: root
     property var activeToasts: []
@@ -28,7 +28,7 @@ Scope {
         try { const d = JSON.parse(raw); if (typeof d.dnd === "boolean") Status.dnd = d.dnd; if (Array.isArray(d.history)) { Status.notifHistory = d.history.slice(0, 50); Status.notifUnread = Status.notifHistory.length; } } catch (e) {}
     }
     function saveState(): void {
-        const payload = JSON.stringify({ dnd: Status.dnd, animations: true, history: Status.notifHistory });
+        const payload = JSON.stringify({ dnd: Status.dnd, history: Status.notifHistory });
         Quickshell.execDetached(["python3", "-c", "import os,sys; p=os.path.expanduser('~/.config/superfedora/notifications.json'); os.makedirs(os.path.dirname(p), exist_ok=True); open(p,'w').write(sys.argv[1])", payload]);
     }
     function findLive(nid) { for (const n of server.trackedNotifications.values) if (n.id === nid) return n; return null; }
@@ -48,15 +48,14 @@ Scope {
         const app = String(appName || "").toLowerCase(), head = (app + " " + String(summary || "")).toLowerCase();
         if (urg === "critical" || /(polkit|firewall|security|critical|alert|auth|pam)/.test(head)) return { role: "security", roleTitle: "SEC ALERT", zone: "top-center" };
         if (/(openclaw|\bagy\b|antigravity|claude|ollama|\bpi\b|chatgpt|codex|grok|vibe|mcode|quake-ai|ai agent)/.test(head)) return { role: "ai", roleTitle: "AI AGENT", zone: "bottom-center" };
-        if (/(tailscale|wireguard|network|wifi|wlan|dns|resolv|vpn|navigator|route)/.test(head)) return { role: "navigator", roleTitle: "NAVIGATOR", zone: "top-right" };
-        if (/(healer|medic|health|thermal|battery|smartctl|scrub|recovery|doctor)/.test(head)) return { role: "medic", roleTitle: "SYS MEDIC", zone: "top-center" };
-        if (/(snapper|snapshot|checkpoint|rollback|vault|archivist|backup|archive)/.test(head)) return { role: "archivist", roleTitle: "ARCHIVIST", zone: "top-right" };
-        if (/(fleet|commander|tactical|mission|override)/.test(head)) return { role: "commander", roleTitle: "COMMANDER", zone: "top-center" };
-        if (/(pipewire|wiremix|synth|audio|sfx|sound|alsa|pulse|spotify|mpd)/.test(head)) return { role: "synth", roleTitle: "AUDIO SYNTH", zone: "bottom-center" };
+        if (/(tailscale|wireguard|\bvpn\b|navigator|mesh|route|dns)/.test(head)) return { role: "navigator", roleTitle: "NAVIGATOR", zone: "top-right" };
+        if (/(healer|medic|thermal|battery|scrub|smart|health)/.test(head)) return { role: "medic", roleTitle: "SYS MEDIC", zone: "top-center" };
+        if (/(snapper|snapshot|checkpoint|rollback|vault|archivist|btrfs)/.test(head)) return { role: "archivist", roleTitle: "ARCHIVIST", zone: "top-right" };
+        if (/(commander|fleet|tactical|mission|mode|profile)/.test(head)) return { role: "commander", roleTitle: "COMMANDER", zone: "top-center" };
+        if (/(pipewire|synth|audio|sfx|sound|volume|speaker|mic)/.test(head)) return { role: "synth", roleTitle: "AUDIO SYNTH", zone: "bottom-center" };
+        if (/(firefox|discord|slack|spotify|chrome|chromium|brave|thunderbird|telegram|signal|steam|nautilus)/.test(app)) return { role: "app", roleTitle: "APP COMMS", zone: "top-right" };
         if (/(forge|\bdnf\b|cargo|\bgcc\b|\bmake\b|cmake|rustup|flatpak|update|compiler|build)/.test(head)) return { role: "builder", roleTitle: "BUILDER", zone: "top-right" };
-        if (/(firefox|discord|slack|chrome|chromium|brave|thunderbird|telegram|signal|steam|nautilus)/.test(app)) return { role: "app", roleTitle: "APP COMMS", zone: "top-right" };
-        if (/(superfedora|btrfs|recorder|screenshot|display|theme|dock|engineer)/.test(head)) return { role: "engineer", roleTitle: "SYS ENG", zone: "top-right" };
-        return { role: "app", roleTitle: "APP COMMS", zone: "top-right" };
+        return { role: "engineer", roleTitle: "SYS ENG", zone: "top-right" };
     }
 
     function pushItem(raw): void {
@@ -84,15 +83,15 @@ Scope {
             ai:        { role: "ai",        roleTitle: "AI AGENT",    zone: "bottom-center", appName: "AGY // OPENCLAW",  summary: "Neural Harness Link Active",   body: "Context indexed. Ready for code synthesis and workstation automation.", urgency: "normal", timeout: 6000 },
             security:  { role: "security",  roleTitle: "SEC ALERT",   zone: "top-center",    appName: "POLKIT // GUARD",  summary: "Privilege Escalation Check",   body: "Critical telemetry & policy guard monitoring active on root subvolume.", urgency: "critical", timeout: 6500 },
             builder:   { role: "builder",   roleTitle: "BUILDER",     zone: "top-right",     appName: "SF FORGE",         summary: "Native Target Compiled",       body: "Built with -O3 -march=native -flto=auto and linked via mold.", urgency: "normal", timeout: 6000 },
-            engineer:  { role: "engineer",  roleTitle: "SYS ENG",     zone: "top-right",     appName: "SUPERFEDORA",      summary: "Btrfs Checkpoint Verified",    body: "Workstation subvolume state synchronized and ready for rollback.", urgency: "normal", timeout: 6000 },
+            engineer:  { role: "engineer",  roleTitle: "SYS ENG",     zone: "top-right",     appName: "SUPERFEDORA",      summary: "Workstation Stack Verified",   body: "All 10 modules and systemd session targets synchronized.", urgency: "normal", timeout: 6000 },
             app:       { role: "app",       roleTitle: "APP COMMS",   zone: "top-right",     appName: "FIREFOX",          summary: "External App Transmission",    body: "Incoming desktop application relay framed in 16-bit scanline bezel.", urgency: "normal", timeout: 6000 },
             navigator: { role: "navigator", roleTitle: "NAVIGATOR",   zone: "top-right",     appName: "NET // TAILSCALE", summary: "Mesh Route Synchronized",      body: "Tailscale WireGuard tunnel & low-latency DNS routing locked.", urgency: "normal", timeout: 6000 },
             medic:     { role: "medic",     roleTitle: "SYS MEDIC",   zone: "top-center",    appName: "BTRFS // HEALER",  summary: "Subvolume Health Scrub",       body: "Thermal, SMART, and Btrfs scrub diagnostics verified with zero errors.", urgency: "normal", timeout: 6000 },
             archivist: { role: "archivist", roleTitle: "ARCHIVIST",   zone: "top-right",     appName: "SNAPPER // VAULT", summary: "Immutable Snapshot Sealed",    body: "Timeline checkpoint indexed into cold storage and GRUB boot menu.", urgency: "normal", timeout: 6000 },
             commander: { role: "commander", roleTitle: "COMMANDER",   zone: "top-center",    appName: "FLEET // OPS",     summary: "Tactical Override Active",     body: "Workstation mission parameters locked across all active workspaces.", urgency: "normal", timeout: 6000 },
-            synth:     { role: "synth",     roleTitle: "AUDIO SYNTH", zone: "bottom-center", appName: "PIPEWIRE // DSP",  summary: "16-Bit PCM Synth Locked",      body: "Low-latency PipeWire quantum 64/48000Hz and FM chiptune cues online.", urgency: "normal", timeout: 6000 }
+            synth:     { role: "synth",     roleTitle: "AUDIO SYNTH", zone: "bottom-center", appName: "PIPEWIRE // DSP",  summary: "16-Bit PCM Synth Locked",      body: "Low-latency PipeWire quantum and 16-bit WAV audio cues online.", urgency: "normal", timeout: 6000 }
         };
-        if (r === "all") { for (const k of ["ai", "security", "builder", "engineer", "navigator", "medic", "archivist", "commander", "synth", "app"]) { root.synthSeq += 1; root.pushItem(Object.assign({ id: root.synthSeq }, samples[k])); } }
+        if (r === "all") { for (const k of Object.keys(samples)) { root.synthSeq += 1; root.pushItem(Object.assign({ id: root.synthSeq }, samples[k])); } }
         else if (samples[r]) { root.synthSeq += 1; root.pushItem(Object.assign({ id: root.synthSeq }, samples[r])); Status.playSfx(r === "security" ? "alert" : "confirm"); }
     }
 
@@ -126,7 +125,6 @@ Scope {
         function toggle(): void { Status.centerToggleSeq += 1; }
         function reload(): void { root.loadState(); }
         function banner(kind: string): void { root.triggerBanner(kind, ""); }
-        function bannerSub(kind: string, sub: string): void { root.triggerBanner(kind, sub); }
         function cast(role: string): void { root.triggerCastTest(role); }
     }
 
@@ -140,8 +138,9 @@ Scope {
         }
     }
 
+    // Multi-Zone 16-Bit Comms Windows: top-center (Security), top-right (Builder/Engineer/App), bottom-center (AI Agent)
     Variants {
-        model: [{ zoneId: "top-center", w: 450 }, { zoneId: "top-right", w: 420 }, { zoneId: "bottom-center", w: 550 }]
+        model: [{ zoneId: "top-center", w: 440 }, { zoneId: "top-right", w: 410 }, { zoneId: "bottom-center", w: 540 }]
         PanelWindow {
             id: zoneWin; required property var modelData
             readonly property string zid: modelData.zoneId
@@ -162,54 +161,57 @@ Scope {
                         readonly property bool hasBody: String(modelData.body || "") !== ""
                         readonly property string fullBody: String(modelData.body || modelData.summary || "")
                         readonly property bool hasAppIcon: modelData.role === "app" && (modelData.image !== "" || modelData.appIcon !== "")
-                        property int visibleChars: 0; property bool talkOpen: false; property int animPhase: 0
+                        property int visibleChars: 0; property bool talkOpen: false
                         readonly property bool typing: card.visibleChars < card.fullBody.length
-                        readonly property color roleColor: modelData.role === "security" ? Theme.danger : (modelData.role === "builder" || modelData.role === "medic" ? Theme.ok : (modelData.role === "ai" ? Theme.primary : (modelData.role === "engineer" || modelData.role === "navigator" ? Theme.cyan : (modelData.role === "archivist" || modelData.role === "commander" ? Theme.warning : Theme.magenta))))
+                        readonly property color roleColor: modelData.role === "security" ? Theme.danger : (modelData.role === "builder" ? Theme.ok : (modelData.role === "ai" ? Theme.primary : (modelData.role === "engineer" ? Theme.accent : Theme.magenta)))
 
-                        Layout.fillWidth: true; implicitHeight: Math.max(88, contentRow.implicitHeight + 20)
+                        Layout.fillWidth: true; implicitHeight: Math.max(86, contentRow.implicitHeight + 20)
                         color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.96); radius: Theme.radius; border.width: 2; border.color: card.roleColor
                         Rectangle { anchors { fill: parent; margins: 3 } color: "transparent"; radius: Theme.radiusSm; border.width: 1; border.color: Theme.border }
-                        NumberAnimation on opacity { from: 0.0; to: 1.0; duration: 140; easing.type: Easing.OutQuad }
 
                         Timer { running: card.modelData.urgency !== "critical"; interval: card.modelData.timeout || 5500; onTriggered: root.hideToast(card.modelData.id) }
                         Timer {
-                            running: true; interval: 85; repeat: true; triggeredOnStart: true
-                            onTriggered: {
-                                card.animPhase = (card.animPhase + 1) % 32;
-                                if (card.typing) { card.visibleChars = Math.min(card.fullBody.length, card.visibleChars + Math.max(1, Math.ceil(card.fullBody.length / 14))); card.talkOpen = !card.talkOpen; }
-                                else { card.talkOpen = (card.animPhase % 8 === 0); }
-                                portraitCanvas.requestPaint();
-                            }
+                            running: card.typing; interval: 25; repeat: true; triggeredOnStart: true
+                            onTriggered: { card.visibleChars = Math.min(card.fullBody.length, card.visibleChars + Math.max(1, Math.ceil(card.fullBody.length / 12))); card.talkOpen = card.typing ? !card.talkOpen : false; portraitCanvas.requestPaint(); }
+                        }
+                        Connections {
+                            target: Theme
+                            function onModeChanged() { portraitCanvas.requestPaint(); }
+                            function onBgChanged() { portraitCanvas.requestPaint(); }
+                            function onBlueChanged() { portraitCanvas.requestPaint(); }
+                            function onCyanChanged() { portraitCanvas.requestPaint(); }
                         }
 
                         RowLayout {
                             id: contentRow; anchors { fill: parent; margins: 10 } spacing: 12
                             Rectangle {
                                 id: portraitFrame; Layout.preferredWidth: 64; Layout.preferredHeight: 64; Layout.alignment: Qt.AlignTop
-                                color: Theme.bgAlt; radius: Theme.radiusSm; border.width: 2; border.color: (card.animPhase % 2 === 0 && card.modelData.role === "security") ? Theme.warning : card.roleColor
+                                color: Theme.bgAlt; radius: Theme.radiusSm; border.width: 2; border.color: card.roleColor
                                 Rectangle { anchors { fill: parent; margins: 2 } color: "transparent"; border.width: 1; border.color: Theme.border }
-                                Image { id: castImg; anchors { fill: parent; margins: 4 } fillMode: Image.PreserveAspectFit; smooth: false; source: card.hasAppIcon ? "" : ("file://" + root.castDir + (card.modelData.role || "engineer") + ".svg"); visible: !card.hasAppIcon && status === Image.Ready }
+                                Image { id: castImg; property bool tryPng: false; anchors { fill: parent; margins: 4 } fillMode: Image.PreserveAspectFit; smooth: false; source: card.hasAppIcon ? "" : ("file://" + root.castDir + (card.modelData.role || "engineer") + (tryPng ? ".png" : ".svg")); visible: !card.hasAppIcon && status === Image.Ready; onStatusChanged: { if (status === Image.Error && !tryPng) tryPng = true; portraitCanvas.requestPaint(); } }
                                 IconImage { readonly property string appSrc: card.modelData.image || card.modelData.appIcon; visible: card.hasAppIcon; anchors { fill: parent; margins: 8 } implicitSize: 48; source: appSrc.startsWith("/") ? "file://" + appSrc : (appSrc !== "" ? Quickshell.iconPath(appSrc, true) : "") }
                                 Canvas {
                                     id: portraitCanvas; anchors { fill: parent; margins: 4 }
                                     onPaint: {
-                                        const ctx = getContext("2d"), u = width / 16.0, rl = card.modelData.role || "engineer", ph = card.animPhase;
+                                        const ctx = getContext("2d"), u = width / 16.0, rl = card.modelData.role || "engineer";
                                         const px = (x, y, w, h, c) => { ctx.fillStyle = c.toString(); ctx.fillRect(Math.round(x * u), Math.round(y * u), Math.ceil(w * u), Math.ceil(h * u)); };
                                         ctx.clearRect(0, 0, width, height);
-                                        if (!card.hasAppIcon && castImg.status !== Image.Ready) {
-                                            px(0, 0, 16, 16, Theme.bg); px(3, 2, 10, 2, card.roleColor); px(3, 4, 10, 8, Theme.border); px(3, 12, 10, 3, Theme.bgAlt); px(4, 5, 8, 3, Theme.bg); px(4, 9, 8, 2, Theme.bg);
-                                        }
-                                        if (!card.hasAppIcon) {
-                                            const blink = (ph % 16 === 15), sweep = 4 + (ph % 7);
-                                            if (blink) { px(5, 6, 2, 1, Theme.bg); px(9, 6, 2, 1, Theme.bg); }
-                                            else if (card.talkOpen) { px(5, 6, 2, 1, Theme.fg); px(9, 6, 2, 1, Theme.fg); }
-                                            if (rl === "navigator" || rl === "commander") px(sweep, 5, 2, 1, Theme.fg);
-                                            else if (rl === "synth") { px(5, 9, 1, 1 + (ph % 2), Theme.cyan); px(7, 8, 2, 1 + ((ph + 1) % 3), card.roleColor); px(10, 9, 1, 1 + (ph % 2), Theme.primary); }
-                                            else if (card.talkOpen) px(5, 9, 6, 2, card.roleColor);
-                                            if (ph % 2 === 0) px(7, 0, 2, 1, card.roleColor);
+                                        if (!card.hasAppIcon && !(castImg.tryPng && castImg.status === Image.Ready)) {
+                                            px(0, 0, 16, 16, Theme.bg);
+                                            if (rl === "ai") { px(7, 0, 2, 2, Theme.primary); px(3, 2, 10, 2, card.roleColor); px(1, 5, 1, 4, Theme.primary); px(14, 5, 1, 4, Theme.primary); }
+                                            else if (rl === "security") { px(3, 1, 10, 2, card.roleColor); px(7, 1, 2, 3, Theme.warning); px(1, 5, 1, 4, card.roleColor); px(14, 5, 1, 4, card.roleColor); }
+                                            else if (rl === "builder") { px(4, 1, 8, 2, Theme.warning); px(2, 2, 12, 3, card.roleColor); px(6, 1, 4, 3, Theme.primary); }
+                                            else if (rl === "app") { px(3, 1, 10, 1, card.roleColor); px(2, 2, 12, 10, Theme.border); px(3, 3, 10, 8, Theme.bgAlt); px(6, 12, 4, 2, Theme.border); px(4, 14, 8, 1, card.roleColor); }
+                                            else { px(4, 1, 8, 1, Theme.primary); px(3, 2, 10, 2, card.roleColor); px(2, 4, 12, 1, Theme.primary); px(1, 6, 2, 3, card.roleColor); px(13, 6, 2, 3, Theme.primary); }
+                                            if (rl !== "app") { px(3, 4, 10, 8, Theme.border); px(3, 12, 10, 3, Theme.bgAlt); px(6, 13, 4, 1, card.roleColor); }
+                                            px(4, 5, 8, 3, Theme.bg); px(4, 9, 8, 2, Theme.bg);
+                                            const ec = card.talkOpen ? Theme.fg : (rl === "security" ? Theme.warning : Theme.primary);
+                                            px(5, 6, 2, 1, ec); px(9, 6, 2, 1, ec); px(5, 9, 6, card.talkOpen ? 2 : 1, card.talkOpen ? Theme.fg : card.roleColor);
+                                        } else if (!card.hasAppIcon && card.talkOpen) {
+                                            px(5, 6, 2, 1, Theme.fg); px(9, 6, 2, 1, Theme.fg); px(5, 9, 6, 2, card.roleColor);
                                         }
                                         ctx.fillStyle = Qt.rgba(0, 0, 0, 0.22).toString();
-                                        for (let y = (ph % 3); y < height; y += 3) ctx.fillRect(0, y, width, 1);
+                                        for (let y = 0; y < height; y += 3) ctx.fillRect(0, y, width, 1);
                                     }
                                 }
                             }
