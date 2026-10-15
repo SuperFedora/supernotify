@@ -161,7 +161,7 @@ pub fn sync_cast_assets(env: &NotifyEnv) -> usize {
 
 pub fn print_roster(env: &NotifyEnv) {
     let synced = sync_cast_assets(env);
-    println!("SuperNotify v0.1.0 — 16-Bit Animated Workstation Cast Roster ({} Specialists, {} SVGs synced)", CAST_ROSTER.len(), synced);
+    println!("SuperNotify v0.2.0 — 16-Bit Animated Workstation Cast Roster ({} Specialists, {} SVGs synced)", CAST_ROSTER.len(), synced);
     println!("  KEY  ID          ROLE         ZONE           CALLSIGN          ANIMATION PROFILE");
     println!("  ---  --          ----         ----           --------          -----------------");
     for m in CAST_ROSTER {

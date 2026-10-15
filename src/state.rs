@@ -78,13 +78,24 @@ impl NotifyEnv {
     fn resolve_repo_root(home: &PathBuf) -> PathBuf {
         if let Ok(r) = env::var("SUPERNOTIFY_ROOT") {
             let p = PathBuf::from(r);
-            if p.join("cast").is_dir() {
-                return p;
-            }
+            if p.join("cast").is_dir() { return p; }
         }
-        let proj = home.join("Projects/superfedora/supernotify");
-        if proj.join("cast").is_dir() {
-            return proj;
+        if let Ok(sf) = env::var("SF_ROOT") {
+            let p = PathBuf::from(sf).join("dotfiles/.config/superfedora");
+            if p.join("cast").is_dir() { return p; }
+        }
+        for cand in [
+            home.join("Projects/superfedora/supernotify"),
+            home.join("Projects/superfedora/superfedora/dotfiles/.config/superfedora"),
+            home.join(".local/share/supernotify"),
+            home.join(".local/share/superfedora/dotfiles/.config/superfedora"),
+            PathBuf::from("/etc/skel/.config/superfedora"),
+            PathBuf::from("/usr/share/superfedora"),
+            PathBuf::from("/home/jeryd/Projects/superfedora/supernotify"),
+        ] {
+            if cand.join("cast").is_dir() {
+                return cand;
+            }
         }
         home.join(".local/share/supernotify")
     }
