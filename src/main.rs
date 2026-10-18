@@ -13,7 +13,7 @@ use std::io::{self, IsTerminal};
 use std::process::{self, Command};
 
 fn print_help() {
-    println!("SuperNotify v0.4.0 — Notification & Full-Screen WARNING Controller");
+    println!("SuperNotify v0.5.0 — Notification & Full-Screen WARNING Controller");
     println!("Usage:");
     println!("  supernotify                                    Launch interactive Notification TUI");
     println!("  supernotify tui                                Launch interactive Notification TUI");
@@ -44,7 +44,7 @@ fn main() {
     match action {
         "tui" => process::exit(run_tui(&env)),
         "version" | "--version" | "-V" => {
-            println!("supernotify 0.4.0");
+            println!("supernotify 0.5.0");
         }
         "status" | "overlay" | "--overlay" => {
             println!(
