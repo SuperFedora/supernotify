@@ -9,7 +9,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
-pub const PALETTES: &[(&str, (u8, u8, u8), (u8, u8, u8))] = &[
+pub type PaletteEntry = (&'static str, (u8, u8, u8), (u8, u8, u8));
+pub const PALETTES: &[PaletteEntry] = &[
     ("01-crimson", (247, 118, 142), (255, 158, 100)),
     ("02-scarlet", (255, 95, 110), (247, 118, 142)),
     ("03-ember", (255, 122, 89), (224, 175, 104)),
