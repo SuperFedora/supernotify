@@ -42,7 +42,6 @@ pub struct NotifState {
 pub struct NotifyEnv {
     pub _home: PathBuf,
     pub state_dir: PathBuf,
-    pub repo_root: PathBuf,
     pub _theme_color: String,
     pub pri_rgb: (u8, u8, u8),
     pub sec_rgb: (u8, u8, u8),
@@ -55,8 +54,7 @@ impl NotifyEnv {
             .map(PathBuf::from)
             .unwrap_or_else(|_| home.join(".config"))
             .join("superfedora");
-        let _ = fs::create_dir_all(state_dir.join("cast"));
-        let repo_root = Self::resolve_repo_root(&home);
+        let _ = fs::create_dir_all(&state_dir);
         let mut theme_color = String::from("12-cobalt");
         if let Ok(txt) = fs::read_to_string(state_dir.join("theme.env")) {
             for line in txt.lines() {
@@ -72,32 +70,7 @@ impl NotifyEnv {
             .find(|(id, _, _)| *id == theme_color)
             .map(|(_, p, s)| (*p, *s))
             .unwrap_or(((122, 162, 247), (187, 154, 247)));
-        Self {  _home: home, state_dir, repo_root,  _theme_color: theme_color, pri_rgb, sec_rgb }
-    }
-
-    fn resolve_repo_root(home: &PathBuf) -> PathBuf {
-        if let Ok(r) = env::var("SUPERNOTIFY_ROOT") {
-            let p = PathBuf::from(r);
-            if p.join("cast").is_dir() { return p; }
-        }
-        if let Ok(sf) = env::var("SF_ROOT") {
-            let p = PathBuf::from(sf).join("dotfiles/.config/superfedora");
-            if p.join("cast").is_dir() { return p; }
-        }
-        for cand in [
-            home.join("Projects/superfedora/supernotify"),
-            home.join("Projects/superfedora/superfedora/dotfiles/.config/superfedora"),
-            home.join(".local/share/supernotify"),
-            home.join(".local/share/superfedora/dotfiles/.config/superfedora"),
-            PathBuf::from("/etc/skel/.config/superfedora"),
-            PathBuf::from("/usr/share/superfedora"),
-            PathBuf::from("/home/jeryd/Projects/superfedora/supernotify"),
-        ] {
-            if cand.join("cast").is_dir() {
-                return cand;
-            }
-        }
-        home.join(".local/share/supernotify")
+        Self { _home: home, state_dir, _theme_color: theme_color, pri_rgb, sec_rgb }
     }
 
     pub fn pri(&self) -> Color {
